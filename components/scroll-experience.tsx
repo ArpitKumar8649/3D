@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -18,6 +18,18 @@ const getFrameUrl = (index: number) =>
 
 export default function ScrollExperience() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  // Loading state — page stays covered until frames are ready
+  const [progress, setProgress] = useState(0)
+  const [isReady, setIsReady] = useState(false)
+
+  // Prevent scrolling on the blank page while the sequence preloads
+  useEffect(() => {
+    document.body.style.overflow = isReady ? "" : "hidden"
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isReady])
 
   // Overlay refs
   const heroRef = useRef<HTMLDivElement>(null)
@@ -78,18 +90,33 @@ export default function ScrollExperience() {
     const images: HTMLImageElement[] = []
     let loadedCount = 0
 
+    const handleFrameSettled = (index: number) => {
+      loadedCount++
+      setProgress(Math.round((loadedCount / FRAME_COUNT) * 100))
+
+      // Draw the very first frame as soon as it is available
+      if (index === 0) {
+        setCanvasSize()
+        drawFrame(0)
+      }
+
+      // Reveal the page only once every frame is ready to appear
+      if (loadedCount >= FRAME_COUNT) {
+        setCanvasSize()
+        drawFrame(0)
+        ScrollTrigger.refresh()
+        setIsReady(true)
+      }
+    }
+
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image()
       img.crossOrigin = "anonymous"
       img.src = getFrameUrl(i + 1)
-      img.onload = () => {
-        loadedCount++
-        // Draw the very first frame as soon as it is available
-        if (i === 0) {
-          setCanvasSize()
-          drawFrame(0)
-        }
-      }
+      // Count both successes and failures so a single bad frame never
+      // blocks the page from ever revealing.
+      img.onload = () => handleFrameSettled(i)
+      img.onerror = () => handleFrameSettled(i)
       images[i] = img
     }
     framesRef.current = images
@@ -228,6 +255,40 @@ export default function ScrollExperience() {
 
   return (
     <>
+      {/* Loading screen — covers everything until all frames are ready */}
+      <div
+        className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-background transition-opacity duration-700 ${
+          isReady ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
+        aria-hidden={isReady}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="hud-grid pointer-events-none absolute inset-0 opacity-40" />
+        <div className="relative flex flex-col items-center gap-6">
+          {/* Spinner */}
+          <div className="relative h-14 w-14">
+            <div className="absolute inset-0 rounded-full border-2 border-white/10" />
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-accent [animation-duration:0.9s]" />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <p className="font-mono text-xs uppercase tracking-[0.4em] text-accent text-glow-accent">
+              Initializing Core
+            </p>
+            {/* Progress bar */}
+            <div className="mt-1 h-px w-48 overflow-hidden bg-white/15">
+              <div
+                className="h-full bg-accent transition-[width] duration-200 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="font-mono text-[11px] tabular-nums tracking-[0.2em] text-muted">
+              {progress}% // LOADING SEQUENCE
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Fixed full-screen canvas background */}
       <div className="fixed inset-0 z-0 bg-background">
         <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />
