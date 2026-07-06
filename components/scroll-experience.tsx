@@ -23,9 +23,24 @@ export default function ScrollExperience() {
   const [progress, setProgress] = useState(0)
   const [isReady, setIsReady] = useState(false)
 
+  // Keep the page pinned to the top so the browser never restores a stale
+  // scroll position (which caused a jump-up-then-settle on the first scroll).
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual"
+    }
+    window.scrollTo(0, 0)
+  }, [])
+
   // Prevent scrolling on the blank page while the sequence preloads
   useEffect(() => {
     document.body.style.overflow = isReady ? "" : "hidden"
+    // When the page is revealed, force the top and resync ScrollTrigger so the
+    // canvas frame + overlays start exactly at progress 0 with no jump.
+    if (isReady) {
+      window.scrollTo(0, 0)
+      requestAnimationFrame(() => ScrollTrigger.refresh())
+    }
     return () => {
       document.body.style.overflow = ""
     }
