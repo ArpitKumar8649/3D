@@ -249,6 +249,8 @@ export default function ScrollExperience() {
 
         {/* Section 2 — Spec cards */}
         <div className="absolute inset-0 flex items-center justify-center px-6">
+          {/* Localized dark scrim so the glass cards read over bright chrome */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[1000px] max-w-[96vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-black/60 blur-3xl" />
           <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
             <SpecCard
               ref={cardLeftRef}
@@ -312,22 +314,27 @@ const SpecCard = ({
   return (
     <div
       ref={ref}
-      className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-md"
+      className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-8 shadow-[0_8px_50px_rgba(0,0,0,0.65)] backdrop-blur-md"
     >
       {/* top edge highlight */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-accent">
-        <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+      {/* subtle accent glow wash */}
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-accent/20 blur-3xl" />
+      {/* HUD corner brackets */}
+      <span className="hud-corner left-3 top-3 border-l border-t" aria-hidden="true" />
+      <span className="hud-corner bottom-3 right-3 border-b border-r" aria-hidden="true" />
+      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-accent text-glow-accent">
+        <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
         {label}
       </p>
-      <p className="mt-3 text-3xl font-semibold text-foreground sm:text-4xl">
+      <p className="text-glow-soft mt-3 text-3xl font-semibold text-foreground sm:text-4xl">
         {title}
       </p>
       <ul className="mt-6 space-y-3">
         {lines.map((line) => (
           <li
             key={line}
-            className="flex items-center gap-3 text-sm text-muted"
+            className="text-glow-soft flex items-center gap-3 text-sm text-foreground/75"
           >
             <span className="h-1 w-1 rounded-full bg-accent" aria-hidden="true" />
             {line}
