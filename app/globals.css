@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), "Geist Fallback", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono Fallback", monospace;
+
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-muted: #a1a1aa;
+  --color-accent: #22d3ee;
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --muted: #a1a1aa;
+  --accent: #22d3ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Metallic glowing border for the final CTA */
+.metallic-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.metallic-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(161, 161, 170, 0.2) 40%,
+    rgba(34, 211, 238, 0.8) 70%,
+    rgba(255, 255, 255, 0.9)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.metallic-glow {
+  box-shadow:
+    0 0 20px rgba(34, 211, 238, 0.25),
+    0 0 60px rgba(34, 211, 238, 0.15),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
