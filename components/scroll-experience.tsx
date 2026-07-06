@@ -302,9 +302,13 @@ export default function ScrollExperience() {
           <p className="text-glow-soft mx-auto mt-4 max-w-sm text-pretty text-foreground/75">
             Reserve your NEXUS&#8209;1 allocation before general availability.
           </p>
-          <button className="metallic-border metallic-glow pointer-events-auto mt-8 rounded-full bg-black/40 px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-foreground backdrop-blur-md transition-transform duration-300 hover:scale-105">
-            Request Access
-          </button>
+          <div className="relative mt-8 inline-block">
+            {/* grounding shadow beneath the CTA button */}
+            <div className="pointer-events-none absolute -bottom-6 left-1/2 h-8 w-3/4 -translate-x-1/2 rounded-[50%] bg-black/70 blur-2xl" />
+            <button className="metallic-border metallic-glow pointer-events-auto rounded-full bg-black/40 px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-foreground shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] backdrop-blur-md transition-transform duration-300 hover:scale-105">
+              Request Access
+            </button>
+          </div>
         </div>
       </div>
     </>
@@ -329,7 +333,7 @@ const SpecCard = ({
   return (
     <div
       ref={ref}
-      className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-8 shadow-[0_8px_50px_rgba(0,0,0,0.65)] backdrop-blur-md"
+      className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-8 shadow-[0_40px_70px_-20px_rgba(0,0,0,0.95),0_20px_40px_-10px_rgba(0,0,0,0.8),0_8px_50px_rgba(0,0,0,0.5)] backdrop-blur-md"
     >
       {/* top edge highlight */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
