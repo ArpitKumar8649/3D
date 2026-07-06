@@ -23,6 +23,7 @@ export default function ScrollExperience() {
   const heroRef = useRef<HTMLDivElement>(null)
   const cardLeftRef = useRef<HTMLDivElement>(null)
   const cardRightRef = useRef<HTMLDivElement>(null)
+  const cardScrimRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
   // Mutable render state kept outside of React re-renders
@@ -127,6 +128,7 @@ export default function ScrollExperience() {
       gsap.set(heroRef.current, { autoAlpha: 0, y: 40, letterSpacing: "0.15em" })
       gsap.set(cardLeftRef.current, { autoAlpha: 0, xPercent: -60 })
       gsap.set(cardRightRef.current, { autoAlpha: 0, xPercent: 60 })
+      gsap.set(cardScrimRef.current, { autoAlpha: 0 })
       gsap.set(ctaRef.current, { autoAlpha: 0, scale: 0.92 })
 
       const master = gsap.timeline({
@@ -167,6 +169,11 @@ export default function ScrollExperience() {
       // Section 2 — Spec cards slide in / dissolve out (25% → 55%)
       master
         .to(
+          cardScrimRef.current,
+          { autoAlpha: 1, ease: "power2.out", duration: 0.1 },
+          0.26,
+        )
+        .to(
           cardLeftRef.current,
           { autoAlpha: 1, xPercent: 0, ease: "power3.out", duration: 0.12 },
           0.28,
@@ -179,6 +186,11 @@ export default function ScrollExperience() {
         .to(
           [cardLeftRef.current, cardRightRef.current],
           { autoAlpha: 0, y: -30, ease: "power2.in", duration: 0.08 },
+          0.5,
+        )
+        .to(
+          cardScrimRef.current,
+          { autoAlpha: 0, ease: "power2.in", duration: 0.08 },
           0.5,
         )
 
@@ -250,7 +262,10 @@ export default function ScrollExperience() {
         {/* Section 2 — Spec cards */}
         <div className="absolute inset-0 flex items-center justify-center px-6">
           {/* Localized dark scrim so the glass cards read over bright chrome */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[1000px] max-w-[96vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-black/60 blur-3xl" />
+          <div
+            ref={cardScrimRef}
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[1000px] max-w-[96vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-black/60 blur-3xl"
+          />
           <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
             <SpecCard
               ref={cardLeftRef}
