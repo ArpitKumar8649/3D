@@ -219,21 +219,30 @@ export default function ScrollExperience() {
       {/* Fixed full-screen canvas background */}
       <div className="fixed inset-0 z-0 bg-background">
         <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />
-        {/* Subtle vignette to keep text legible over bright frames */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
+        {/* Faint tech grid for cyberpunk texture */}
+        <div className="hud-grid pointer-events-none absolute inset-0 opacity-60" />
+        {/* Vignette to keep text legible over bright frames */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.82)_100%)]" />
+        {/* Top scrim so the glass navbar always reads cleanly */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/80 to-transparent" />
+        {/* Bottom scrim for the status readout */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
 
       {/* Overlays live in a fixed layer; opacity/position driven by GSAP */}
       <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
         {/* Section 1 — Hero */}
-        <div ref={heroRef} className="px-6 text-center">
-          <p className="mb-4 font-mono text-xs uppercase tracking-[0.4em] text-accent">
+        <div ref={heroRef} className="relative px-6 text-center">
+          {/* Localized dark scrim so white copy never washes into chrome */}
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[440px] w-[760px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-black/60 blur-3xl" />
+          <p className="mb-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.4em] text-accent text-glow-accent">
+            <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" />
             Neural Compute Core
           </p>
-          <h1 className="text-balance text-5xl font-semibold leading-[1.05] text-foreground sm:text-7xl md:text-8xl">
+          <h1 className="text-glow-strong text-balance text-6xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-8xl md:text-9xl">
             NEXUS&#8209;1
           </h1>
-          <p className="mx-auto mt-6 max-w-md text-pretty text-base text-muted sm:text-lg">
+          <p className="text-glow-soft mx-auto mt-6 max-w-md text-pretty text-base text-foreground/80 sm:text-lg">
             Infrastructure for the age of intelligence. Engineered atom by atom.
           </p>
         </div>
@@ -266,10 +275,14 @@ export default function ScrollExperience() {
 
         {/* Section 3 — CTA */}
         <div ref={ctaRef} className="absolute px-6 text-center">
-          <h2 className="text-balance text-4xl font-semibold text-foreground sm:text-6xl">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[360px] w-[620px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-black/55 blur-3xl" />
+          <p className="mb-4 font-mono text-xs uppercase tracking-[0.4em] text-accent text-glow-accent">
+            General Availability // Q3
+          </p>
+          <h2 className="text-glow-strong text-balance text-5xl font-semibold tracking-tight text-foreground sm:text-7xl">
             Deploy the future.
           </h2>
-          <p className="mx-auto mt-4 max-w-sm text-pretty text-muted">
+          <p className="text-glow-soft mx-auto mt-4 max-w-sm text-pretty text-foreground/75">
             Reserve your NEXUS&#8209;1 allocation before general availability.
           </p>
           <button className="metallic-border metallic-glow pointer-events-auto mt-8 rounded-full bg-black/40 px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-foreground backdrop-blur-md transition-transform duration-300 hover:scale-105">
@@ -299,9 +312,12 @@ const SpecCard = ({
   return (
     <div
       ref={ref}
-      className="rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md"
+      className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-md"
     >
-      <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
+      {/* top edge highlight */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-accent">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
         {label}
       </p>
       <p className="mt-3 text-3xl font-semibold text-foreground sm:text-4xl">
