@@ -46,6 +46,10 @@ export default function ScrollExperience() {
     }
   }, [isReady])
 
+  // Fixed stage wrapper — dissolves out as the sequence ends so the page
+  // becomes a normal scroll and the finale content below is revealed.
+  const stageRef = useRef<HTMLDivElement>(null)
+
   // Overlay refs
   const heroRef = useRef<HTMLDivElement>(null)
   const cardLeftRef = useRef<HTMLDivElement>(null)
@@ -155,6 +159,16 @@ export default function ScrollExperience() {
           currentFrameRef.current = target
           seq.frame = target
           drawFrame(target)
+        }
+
+        // Dissolve the whole fixed stage over the last 12% of scroll so the
+        // finale content below reveals smoothly and the screen "unpins".
+        const stage = stageRef.current
+        if (stage) {
+          const p = self.progress
+          const fade = p <= 0.88 ? 1 : Math.max(0, 1 - (p - 0.88) / 0.12)
+          stage.style.opacity = String(fade)
+          stage.style.visibility = fade <= 0.001 ? "hidden" : "visible"
         }
       },
     })
@@ -304,9 +318,12 @@ export default function ScrollExperience() {
         </div>
       </div>
 
-      {/* Fixed full-screen canvas background */}
-      <div className="fixed inset-0 z-0 bg-background">
-        <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />
+      {/* Fixed stage — all sequence layers live here and dissolve out at the
+          end so the page becomes a normal scroll (finale revealed below). */}
+      <div ref={stageRef} className="fixed inset-0 z-0">
+        {/* Full-screen canvas background */}
+        <div className="absolute inset-0 bg-background">
+          <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />
         {/* Faint tech grid for cyberpunk texture */}
         <div className="hud-grid pointer-events-none absolute inset-0 opacity-60" />
         {/* Vignette to keep text legible over bright frames */}
@@ -317,8 +334,8 @@ export default function ScrollExperience() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
 
-      {/* Overlays live in a fixed layer; opacity/position driven by GSAP */}
-      <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center">
+        {/* Overlays live in the stage layer; opacity/position driven by GSAP */}
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
         {/* Section 1 — Hero */}
         <div ref={heroRef} className="relative px-6 text-center">
           {/* Localized dark scrim so white copy never washes into chrome */}
@@ -384,6 +401,23 @@ export default function ScrollExperience() {
             <button className="metallic-border metallic-glow pointer-events-auto rounded-full bg-black/40 px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-foreground shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] backdrop-blur-md transition-transform duration-300 hover:scale-105">
               Request Access
             </button>
+          </div>
+        </div>
+        </div>
+
+        {/* Persistent HUD framing (cyberpunk detailing) */}
+        <div className="pointer-events-none absolute inset-0 z-40">
+          <div className="hud-corner left-4 top-20 border-l-2 border-t-2" />
+          <div className="hud-corner right-4 top-20 border-r-2 border-t-2" />
+          <div className="hud-corner bottom-10 left-4 border-b-2 border-l-2" />
+          <div className="hud-corner bottom-10 right-4 border-b-2 border-r-2" />
+        </div>
+
+        {/* Bottom status readout */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-40 flex justify-center px-6">
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted">
+            <span className="live-dot h-1 w-1 rounded-full bg-accent" />
+            <span>Nexus-1 // Neural Compute Core</span>
           </div>
         </div>
       </div>

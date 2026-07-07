@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar"
 import ScrollExperience from "@/components/scroll-experience"
+import FinaleSection from "@/components/finale-section"
 
 export default function Page() {
   return (
@@ -7,24 +8,8 @@ export default function Page() {
       {/* Fixed glassmorphic navbar */}
       <Navbar />
 
-      {/* Fixed canvas + GSAP-driven overlays */}
+      {/* Fixed canvas + GSAP-driven overlays (dissolves out at sequence end) */}
       <ScrollExperience />
-
-      {/* Persistent HUD framing (cyberpunk detailing) */}
-      <div className="pointer-events-none fixed inset-0 z-40">
-        <div className="hud-corner left-4 top-20 border-l-2 border-t-2" />
-        <div className="hud-corner right-4 top-20 border-r-2 border-t-2" />
-        <div className="hud-corner bottom-10 left-4 border-b-2 border-l-2" />
-        <div className="hud-corner bottom-10 right-4 border-b-2 border-r-2" />
-      </div>
-
-      {/* Bottom status readout */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-6">
-        <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted">
-          <span className="live-dot h-1 w-1 rounded-full bg-accent" />
-          <span>Nexus-1 // Neural Compute Core</span>
-        </div>
-      </div>
 
       {/* Tall scroll track (400vh) that drives the timeline */}
       <div
@@ -41,6 +26,9 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      {/* Finale — revealed once the frame sequence dissolves out */}
+      <FinaleSection />
     </main>
   )
 }
