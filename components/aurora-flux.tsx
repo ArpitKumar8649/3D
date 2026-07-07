@@ -249,8 +249,11 @@ export default function AuroraFlux({
       programRef.current = null
       vaoRef.current = null
     }
+    // NOTE: `failed` is intentionally NOT a dependency. When it flips true the
+    // canvas unmounts and we render the fallback, so the effect must not re-run
+    // (and changing the deps-array size at runtime throws a React invariant).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullScreen, pauseWhenHidden, pauseOnHover, mix, failed])
+  }, [fullScreen, pauseWhenHidden, pauseOnHover, mix])
 
   // Animated CSS aurora fallback — always renders something beautiful even
   // when WebGL2 is unavailable.
