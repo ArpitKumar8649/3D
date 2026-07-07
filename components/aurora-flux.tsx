@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 export type AuroraFluxProps = {
   /** Run full-bleed (fills viewport). If false, the canvas just fills its parent. */
@@ -101,6 +101,11 @@ export default function AuroraFlux({
   style,
   ariaLabel = "Aurora flux shader background",
 }: AuroraFluxProps) {
+  // When WebGL2 is unavailable (some mobile browsers / restricted webviews)
+  // or the shader fails to build, we render an animated CSS aurora instead
+  // so this area is never blank/white.
+  const [failed, setFailed] = useState(false)
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const glRef = useRef<WebGL2RenderingContext | null>(null)
   const programRef = useRef<WebGLProgram | null>(null)
@@ -114,6 +119,7 @@ export default function AuroraFlux({
   const uMixRef = useRef<WebGLUniformLocation | null>(null)
 
   useEffect(() => {
+    if (failed) return
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -129,9 +135,15 @@ export default function AuroraFlux({
       canvas.style.display = "block"
     }
 
-    const gl = canvas.getContext("webgl2", { antialias: false, alpha: false })
+    let gl: WebGL2RenderingContext | null = null
+    try {
+      gl = canvas.getContext("webgl2", { antialias: false, alpha: false })
+    } catch {
+      gl = null
+    }
     if (!gl) {
-      console.error("WebGL2 not supported.")
+      // Gracefully fall back to the animated CSS aurora.
+      setFailed(true)
       return
     }
     glRef.current = gl
@@ -156,7 +168,14 @@ export default function AuroraFlux({
       !(pauseOnHover && hoverRef.current)
 
     // program & quad
-    const program = createProgram(gl, VERT, FRAG)
+    let program: WebGLProgram
+    try {
+      program = createProgram(gl, VERT, FRAG)
+    } catch (err) {
+      console.error("[v0] Aurora shader failed, using CSS fallback:", err)
+      setFailed(true)
+      return
+    }
     programRef.current = program
     gl.useProgram(program)
 
@@ -231,7 +250,20 @@ export default function AuroraFlux({
       vaoRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullScreen, pauseWhenHidden, pauseOnHover, mix])
+  }, [fullScreen, pauseWhenHidden, pauseOnHover, mix, failed])
+
+  // Animated CSS aurora fallback — always renders something beautiful even
+  // when WebGL2 is unavailable.
+  if (failed) {
+    return (
+      <div
+        className={`aurora-fallback relative overflow-hidden ${className}`}
+        style={style}
+        role="img"
+        aria-label={ariaLabel}
+      />
+    )
+  }
 
   return (
     <canvas
